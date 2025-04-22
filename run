@@ -1,0 +1,21 @@
+#!/usr/bin/env bash
+
+script_dir=$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)
+
+echo "Script directory: $script_dir"
+filter="$1"
+
+echo "$script_dir -- $filter"
+
+cd $script_dir
+scripts=$(find ./runs -mindepth 1 -maxdepth 1 -type f -perm +111)
+
+for script in $scripts; do
+    if echo "$script" | grep -qv "$filter"; then
+        echo "filtering $script"
+        continue
+    fi
+    echo "running $script"
+    ./$script
+done
+
