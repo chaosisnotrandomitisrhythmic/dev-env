@@ -32,7 +32,15 @@ execute() {
 
 log "$script_dir -- $filter -- $dry"
 cd $script_dir
-scripts=$(find ./runs -mindepth 1 -maxdepth 1 -type f -perm +111)
+
+# Cross-platform way to find executable files
+if [[ "$OSTYPE" == "darwin"* ]]; then
+    # macOS - find files with mac_ prefix and common files
+    scripts=$(find ./runs -mindepth 1 -maxdepth 1 -type f \( -name "mac_*" -o -not -name "linux_*" \) -perm +111)
+else
+    # Linux and other Unix-like systems - find files with linux_ prefix and common files
+    scripts=$(find ./runs -mindepth 1 -maxdepth 1 -type f \( -name "linux_*" -o -not -name "mac_*" \) -executable)
+fi
 
 for script in $scripts; do
     if echo "$script" | grep -qv "$filter"; then
